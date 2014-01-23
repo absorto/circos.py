@@ -8,21 +8,21 @@ import sys, os, shutil
 import subprocess
 
 from jinja2 import Environment, FileSystemLoader
-env = Environment(loader=FileSystemLoader('templates'))
 
 
 
-parser = argparse.ArgumentParser(description='Generate a Circos Plot configuration set')
-parser.add_argument('--circos_path', required=True, help="path to circos command")
+
+parser = argparse.ArgumentParser(description='Generate a Circos Plot configuration set and run circos on it.')
+parser.add_argument('--circos_path', required=True, help="absolute path to circos command")
 parser.add_argument('--path', required=True, help="path to a working directory")
-parser.add_argument('--karyotype', type=argparse.FileType('r'), required=True )
+parser.add_argument('--karyotype', type=argparse.FileType('r'), required=True, help="absolute path to karyotype file" )
 # links
-parser.add_argument('--links',  type=argparse.FileType('r'), required=False, nargs='*' )
+parser.add_argument('--links',  type=argparse.FileType('r'), required=False, nargs='*', help="absolute paths to links data files"  )
 parser.add_argument('--links_colors', required=False, nargs='*')
 parser.add_argument('--links_radius', required=False)
 parser.add_argument('--links_bezier_radius', required=False)
 # tracks
-parser.add_argument('--tracks', type=argparse.FileType('r'), required=False, nargs='*')
+parser.add_argument('--tracks', type=argparse.FileType('r'), required=False, nargs='*', help="absolute paths to tracks data files" )
 parser.add_argument('--types', required=False, nargs='*', choices=['histogram', 'line', 'scatter','heatmap'])
 parser.add_argument('--orientations', required=False, nargs='*', choices=['in', 'out'])
 parser.add_argument('--r0', required=False, nargs='*')
@@ -66,7 +66,7 @@ if __name__ == '__main__':
         for n in range(0,len(tracks)):                      
             t.append({'path': tracks[n].name,
                       'type': types[n],
-                      'color': colors[n],
+                      'color': tracks_colors[n],
                       'r0': "%sr" % radii0[n],
                       'r1': "%sr" % radii1[n],
                       'orientation': orientations[n] })
@@ -83,11 +83,9 @@ if __name__ == '__main__':
     # create directory for templates
     os.makedirs(path)    
 
-    # shutil.copy('templates/bands.conf', path )
-    shutil.copy('templates/ideogram.conf', path )
-    # shutil.copy('templates/ideogram.label.conf', path )
-    # shutil.copy('templates/ideogram.position.conf', path )
-
+    plotpath = os.path.dirname(sys.argv[0])
+    env = Environment(loader=FileSystemLoader(plotpath + '/templates'))
+    shutil.copy(plotpath +'/templates/ideogram.conf', path )
 
     with open( path + '/circos.conf', 'w') as f:
         circos_conf = env.get_template('circos.conf')
