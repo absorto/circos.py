@@ -1,0 +1,58 @@
+<tool id="circos_plot" name="Circos Plot" version="0.1.0">
+  <description>Plot concentric data tracks.</description>
+  <command interpreter="python">circos.py
+  --tracks
+  #for $i, $s in enumerate( $track )
+  ${s.input.file_name}
+  #end for
+  
+  --types 
+  #for $i, $s in enumerate( $track )
+  ${s.type}
+  #end for
+
+  --orientations
+  #for $i, $s in enumerate( $track )
+  ${s.orientation}
+  #end for  
+  </command>
+
+  <inputs>
+    <param name="karyotype" type="data" format="tabular"
+             label="Karyotype"/>
+
+    <repeat name="track" title="Track">
+      <param name="input" type="data" format="tabular"
+             label="Dataset"/>
+      
+      <param name="type"   type="select" format="text" label="Type">
+        <option value="histogram">histogram</option>
+        <option value="line">line</option>
+        <option value="scatter">scatter</option>
+        <option value="heatmap">heatmap</option>
+      </param>
+      
+      <param name="orientation"   type="select" format="text"
+             label="Orientation">
+        <option value="in">in</option>
+        <option value="out">out</option>
+      </param>
+    </repeat>
+    
+
+
+  </inputs>
+  
+  <outputs>
+    <data format="tabular" name="output" />
+  </outputs>
+
+  <help>
+    This tool will render data tracks aligned in concentric circles,
+    the outer one being to a reference genome.
+  </help>
+
+</tool>
+
+
+
