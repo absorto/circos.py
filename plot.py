@@ -4,7 +4,7 @@
 
 import pprint
 import argparse
-import sys, os, shutil
+import sys, os, shutil, tempfile
 import subprocess
 
 from jinja2 import Environment, FileSystemLoader
@@ -13,8 +13,8 @@ from jinja2 import Environment, FileSystemLoader
 
 
 parser = argparse.ArgumentParser(description='Generate a Circos Plot configuration set and run circos on it.')
+parser.add_argument('--output', type=argparse.FileType('w'), required=True, help="absolute path to output file" )
 parser.add_argument('--circos_path', required=True, help="absolute path to circos command")
-parser.add_argument('--path', required=True, help="path to a working directory")
 parser.add_argument('--karyotype', type=argparse.FileType('r'), required=True, help="absolute path to karyotype file" )
 # links
 parser.add_argument('--links',  type=argparse.FileType('r'), required=False, nargs='*', help="absolute paths to links data files"  )
@@ -32,8 +32,8 @@ parser.add_argument('--tracks_colors', required=False, nargs='*')
 
 if __name__ == '__main__':
     args       = parser.parse_args()
+    output     = args.output.name
     circos_path = args.circos_path
-    path       = args.path
     karyotype  = args.karyotype
 
     links      = args.links
@@ -72,16 +72,9 @@ if __name__ == '__main__':
                       'orientation': orientations[n] })
     else:
         t = None
-
-
-    print "links"
-    pprint.pprint(l)
-
-    print "tracks"
-    pprint.pprint(t)
     
-    # create directory for templates
-    os.makedirs(path)    
+    # create temp directory for templates and plot
+    path = tempfile.mkdtemp( prefix='circos-' )
 
     plotpath = os.path.dirname(sys.argv[0])
     env = Environment(loader=FileSystemLoader(plotpath + '/templates'))
@@ -97,10 +90,12 @@ if __name__ == '__main__':
 
 
 
-
-
     os.chdir(path)
     p = subprocess.Popen(circos_path, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     for line in p.stdout.readlines():
         print line,
     retval = p.wait()
+
+    shutil.copy( path + "/circos.png", output )
+    if os.path.exists( path ):
+        shutil.rmtree( path )    

@@ -1,6 +1,9 @@
 <tool id="circos_plot" name="Circos Plot" version="0.1.0">
   <description>Plot concentric data tracks.</description>
-  <command interpreter="python">circos.py
+  <command interpreter="python">plot.py
+  --circos_path ~/bin/circos-0.64/bin/circos
+  --karyotype $karyotype
+  
   --tracks
   #for $i, $s in enumerate( $track )
   ${s.input.file_name}
@@ -14,7 +17,24 @@
   --orientations
   #for $i, $s in enumerate( $track )
   ${s.orientation}
+  #end for
+
+  --tracks_colors
+  #for $s in $track
+  ${s.color}
   #end for  
+
+  --r0
+  #for $s in $track
+  ${s.r0}
+  #end for  
+
+  --r1
+  #for $s in $track
+  ${s.r1}
+  #end for  
+
+  --output $output
   </command>
 
   <inputs>
@@ -37,6 +57,13 @@
         <option value="in">in</option>
         <option value="out">out</option>
       </param>
+
+      <param name="r0" type="float" size="4" label="inner radius"
+             min="0" max="1.5" value="0.8" />
+      <param name="r1" type="float" size="4" label="outer radius"
+             min="0" max="1.5" value="0.89" />
+      <param name="color" type="text" size="30" label="color" />
+          
     </repeat>
     
 
@@ -44,7 +71,7 @@
   </inputs>
   
   <outputs>
-    <data format="tabular" name="output" />
+    <data format="png" name="output" />
   </outputs>
 
   <help>
