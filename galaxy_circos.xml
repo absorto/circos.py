@@ -1,9 +1,9 @@
 <tool id="circos_plot" name="Circos Plot" version="0.1.0">
   <description>Plot concentric data tracks.</description>
   <command interpreter="python">plot.py
-  --circos_path ~/bin/circos-0.64/bin/circos
+  --circos_path ~/downloads/circos-0.66/bin/circos
   --karyotype $karyotype
-  
+  --cytobands $bands
   --tracks
   #for $i, $s in enumerate( $track )
   ${s.input.file_name}
@@ -24,6 +24,11 @@
   ${s.color}
   #end for  
 
+  --extend_bins
+  #for $s in $track
+  ${s.extend_bin}
+  #end for  
+
   --r0
   #for $s in $track
   ${s.r0}
@@ -40,6 +45,7 @@
   <inputs>
     <param name="karyotype" type="data" format="tabular"
              label="Karyotype"/>
+    <param name="bands" type="boolean" label="Display cytobands"/>
 
     <repeat name="track" title="Track">
       <param name="input" type="data" format="tabular"
@@ -56,6 +62,12 @@
              label="Orientation">
         <option value="in">in</option>
         <option value="out">out</option>
+      </param>
+
+      <param name="extend_bin"   type="select" format="text"
+             label="Extend bin">
+        <option value="yes">yes</option>
+        <option value="no">no</option>
       </param>
 
       <param name="r0" type="float" size="4" label="inner radius"

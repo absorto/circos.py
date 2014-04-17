@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser(description='Generate a Circos Plot configurati
 parser.add_argument('--output', type=argparse.FileType('w'), required=True, help="absolute path to output file" )
 parser.add_argument('--circos_path', required=True, help="absolute path to circos command")
 parser.add_argument('--karyotype', type=argparse.FileType('r'), required=True, help="absolute path to karyotype file" )
+parser.add_argument('--cytobands', required=True, choices=['true','false'], help="display cytobands")
+parser.set_defaults(cytobands=False)
 # links
 parser.add_argument('--links',  type=argparse.FileType('r'), required=False, nargs='*', help="absolute paths to links data files"  )
 parser.add_argument('--links_colors', required=False, nargs='*')
@@ -25,6 +27,7 @@ parser.add_argument('--links_bezier_radius', required=False)
 parser.add_argument('--tracks', type=argparse.FileType('r'), required=False, nargs='*', help="absolute paths to tracks data files" )
 parser.add_argument('--types', required=False, nargs='*', choices=['histogram', 'line', 'scatter','heatmap'])
 parser.add_argument('--orientations', required=False, nargs='*', choices=['in', 'out'])
+parser.add_argument('--extend_bins', required=False, nargs='*', choices=['yes','no'])
 parser.add_argument('--r0', required=False, nargs='*')
 parser.add_argument('--r1', required=False, nargs='*')
 parser.add_argument('--tracks_colors', required=False, nargs='*')
@@ -35,6 +38,10 @@ if __name__ == '__main__':
     output     = args.output.name
     circos_path = args.circos_path
     karyotype  = args.karyotype
+    if args.cytobands == 'true':
+        cytobands = True
+    else:
+        cytobands = False
 
     links      = args.links
     links_colors = args.links_colors
@@ -47,6 +54,7 @@ if __name__ == '__main__':
     tracks_colors     = args.tracks_colors
     types      = args.types
     orientations = args.orientations
+    extend_bins = args.extend_bins
 
     # maybe sanity check on input files?
     karyotype_path = karyotype.name
@@ -69,6 +77,7 @@ if __name__ == '__main__':
                       'color': tracks_colors[n],
                       'r0': "%sr" % radii0[n],
                       'r1': "%sr" % radii1[n],
+                      'extend_bin': extend_bins[n],
                       'orientation': orientations[n] })
     else:
         t = None
@@ -78,7 +87,7 @@ if __name__ == '__main__':
 
     plotpath = os.path.dirname(sys.argv[0])
     env = Environment(loader=FileSystemLoader(plotpath + '/templates'))
-    shutil.copy(plotpath +'/templates/ideogram.conf', path )
+#    shutil.copy(plotpath +'/templates/ideogram.conf', path )
 
     with open( path + '/circos.conf', 'w') as f:
         circos_conf = env.get_template('circos.conf')
@@ -86,7 +95,8 @@ if __name__ == '__main__':
                                      links_radius = "%sr" % links_radius,
                                      links_bezier_radius = "%sr" % links_bezier_radius,
                                      tracks       = t,
-                                     karyotype    = karyotype_path  ) )
+                                     karyotype    = karyotype_path,
+                                     cytobands    = cytobands ) )
 
 
 
@@ -97,5 +107,5 @@ if __name__ == '__main__':
     retval = p.wait()
 
     shutil.copy( path + "/circos.png", output )
-    if os.path.exists( path ):
-        shutil.rmtree( path )    
+#    if os.path.exists( path ):
+#        shutil.rmtree( path )    
