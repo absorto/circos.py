@@ -4,6 +4,28 @@
   --circos_path ~/downloads/circos-0.66/bin/circos
   --karyotype $karyotype
   --cytobands $bands
+
+  --links
+  #for $l in $link
+  ${l.input.file_name}
+  #end for  
+
+  --links_colors
+  #for $l in $link
+  ${l.color}
+  #end for  
+
+  --links_radius
+  #for $l in $link
+  ${l.radius}
+  #end for  
+
+  --links_bezier_radius
+  #for $l in $link
+  ${l.bradius}
+  #end for  
+
+
   --tracks
   #for $i, $s in enumerate( $track )
   ${s.input.file_name}
@@ -46,6 +68,21 @@
     <param name="karyotype" type="data" format="tabular"
              label="Karyotype"/>
     <param name="bands" type="boolean" label="Display cytobands"/>
+    <param name="ticks" type="boolean" label="Ticks"/>
+    <param name="chromosomes" type="text" size="40" label="Plot chromosomes" />
+
+    <repeat name="link" title="Links">
+      <param name="input" type="data" format="tabular"
+             label="Dataset"/>
+
+      <param name="radius" type="float" size="4" label="link radius"
+             min="0" max="1.5" value="0.99" />
+      <param name="bradius" type="float" size="4" label="bezier radius"
+             min="0" max="1.5" value="0.4" />
+      <param name="color" type="text" size="30" label="color"
+             value="red" />
+
+    </repeat>
 
     <repeat name="track" title="Track">
       <param name="input" type="data" format="tabular"
@@ -74,7 +111,8 @@
              min="0" max="1.5" value="0.8" />
       <param name="r1" type="float" size="4" label="outer radius"
              min="0" max="1.5" value="0.89" />
-      <param name="color" type="text" size="30" label="color" />
+      <param name="color" type="text" size="30" label="color" 
+             value="vvlgrey" />
           
     </repeat>
     
@@ -87,8 +125,7 @@
   </outputs>
 
   <help>
-    This tool will render data tracks aligned in concentric circles,
-    the outer one being to a reference genome.
+    This tool will render data tracks aligned in concentric circles.
   </help>
 
 </tool>
