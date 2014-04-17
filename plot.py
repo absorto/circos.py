@@ -18,6 +18,7 @@ parser.add_argument('--circos_path', required=True, help="absolute path to circo
 parser.add_argument('--karyotype', type=argparse.FileType('r'), required=True, help="absolute path to karyotype file" )
 parser.add_argument('--cytobands', required=True, choices=['true','false'], help="display cytobands")
 parser.set_defaults(cytobands=False)
+parser.add_argument('--chromosomes', required=False, help="select chromosomes to plot")
 # links
 parser.add_argument('--links',  type=argparse.FileType('r'), required=False, nargs='*', help="absolute paths to links data files"  )
 parser.add_argument('--links_colors', required=False, nargs='*')
@@ -42,6 +43,7 @@ if __name__ == '__main__':
         cytobands = True
     else:
         cytobands = False
+    chromosomes = args.chromosomes
 
     links      = args.links
     links_colors = args.links_colors
@@ -84,11 +86,10 @@ if __name__ == '__main__':
     
     # create temp directory for templates and plot
     path = tempfile.mkdtemp( prefix='circos-' )
-
     plotpath = os.path.dirname(sys.argv[0])
     env = Environment(loader=FileSystemLoader(plotpath + '/templates'))
-#    shutil.copy(plotpath +'/templates/ideogram.conf', path )
 
+    # create conf file from template
     with open( path + '/circos.conf', 'w') as f:
         circos_conf = env.get_template('circos.conf')
         f.write( circos_conf.render( links        = l,
@@ -96,7 +97,8 @@ if __name__ == '__main__':
                                      links_bezier_radius = "%sr" % links_bezier_radius,
                                      tracks       = t,
                                      karyotype    = karyotype_path,
-                                     cytobands    = cytobands ) )
+                                     cytobands    = cytobands,
+                                     chromosomes  = chromosomes ) )
 
 
 

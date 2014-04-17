@@ -5,6 +5,10 @@
   --karyotype $karyotype
   --cytobands $bands
 
+  #if $chromosomes
+  --chromosomes '$chromosomes'
+  #end if
+
   --links
   #for $l in $link
   ${l.input.file_name}
@@ -69,7 +73,27 @@
              label="Karyotype"/>
     <param name="bands" type="boolean" label="Display cytobands"/>
     <param name="ticks" type="boolean" label="Ticks"/>
-    <param name="chromosomes" type="text" size="40" label="Plot chromosomes" />
+    <param name="chromosomes" type="text" size="40" label="Select
+                                                           ideograms
+                                                           (no
+                                                           selection
+                                                           plots
+                                                           all)">
+      <sanitizer>
+        <valid initial="string.printable">
+          <add value=";" />
+          <add value="/" />
+          <add value="[" />
+          <add value="]" />
+          <add value="-" />
+          <add value="$" />
+          <add value="(" />
+          <add value=")" />
+          <add value="," />
+          <add value=":" />
+        </valid>
+      </sanitizer>
+    </param>
 
     <repeat name="link" title="Links">
       <param name="input" type="data" format="tabular"
