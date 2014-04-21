@@ -79,7 +79,6 @@
     <param name="karyotype" type="data" format="tabular"
              label="Karyotype"/>
     <param name="bands" type="boolean" label="Display cytobands"/>
-    <param name="ticks" type="boolean" label="Ticks"/>
     <param name="chromosomes" type="text" size="40" label="Select
                                                            ideograms
                                                            (no

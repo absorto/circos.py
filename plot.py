@@ -98,8 +98,7 @@ if __name__ == '__main__':
                                      tracks       = t,
                                      karyotype    = karyotype_path,
                                      cytobands    = cytobands,
-                                     chromosomes  = chromosomes ) )
-
+                                     chromosomes  = chromosomes ))
 
 
     os.chdir(path)
@@ -109,5 +108,5 @@ if __name__ == '__main__':
     retval = p.wait()
 
     shutil.copy( path + "/circos.png", output )
-#    if os.path.exists( path ):
-#        shutil.rmtree( path )    
+    if os.path.exists( path ):
+        shutil.rmtree( path )    
