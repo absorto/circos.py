@@ -1,7 +1,7 @@
 <tool id="circos_plot" name="Circos Plot" version="0.1.0">
   <description>Plot concentric data tracks.</description>
   <command interpreter="python">plot.py
-  --circos_path ~/downloads/circos-0.66/bin/circos
+  --circos_path ~/bin/circos-0.64/bin/circos
   --karyotype $karyotype
   --cytobands $bands
 
@@ -9,6 +9,8 @@
   --chromosomes '$chromosomes'
   #end if
 
+  #if $link
+  
   --links
   #for $l in $link
   ${l.input.file_name}
@@ -29,7 +31,10 @@
   ${l.bradius}
   #end for  
 
+  #end if
 
+  
+  #if $track
   --tracks
   #for $i, $s in enumerate( $track )
   ${s.input.file_name}
@@ -65,6 +70,8 @@
   ${s.r1}
   #end for  
 
+  #end if
+  
   --output $output
   </command>
 
