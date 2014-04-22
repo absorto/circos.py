@@ -155,8 +155,340 @@
   </outputs>
 
   <help>
-    This tool will render data tracks aligned in concentric circles.
-  </help>
+==============    
+What it does
+==============
+
+Creates a circos plot with tracks and links comming from your
+datasets.
+
+
+
+.. image:: https://raw.githubusercontent.com/absorto/circos.py/master/doc/example_circos.png
+
+
+------
+
+
+
+Following texts mostly taken from the manual_ .
+
+.. _manual: http://circos.ca/documentation/tutorials/
+
+
+=========
+Karyotype
+=========
+
+The karyotype file defines the axes. In biological context, these are
+typically chromosomes, sequence contigs or clones.
+
+Each axis (e.g. chromosome) is defined by unique identifier
+(referenced in data files), label (text tag for the ideogram seen in
+the image), size and color.
+
+In addition to chromosomes, the karyotype file is used to define
+position, identity and color of cytogenetic bands. For some genomes
+these band data are available.
+
+
+defining chromosomes
+====================
+
+Chromosome definitions are formatted as follows
+
+::
+   
+   chr - ID LABEL START END COLOR
+
+The first two fields are always "chr", indicating that the line
+defines a chromosome, and "-". The second field defines the parent
+structure and is used only for band definitions.
+
+The id is the identifier used in data files whereas the LABEL is the
+text that will appear next to the ideogram on the image. If you are
+working with multiple species, I suggest prefixing the chromosome
+number with a species identifier (e.g., hs = Homo sapiens, mm = Mus
+musculus, etc). Even when working with only one species, prefixing the
+chromosome with a species code is highly recommended — this will
+greatly help in creating more transparent data files.
+
+The start and end values define the size of the chromosome. The
+karyotype file should store the entire chromsome size, not just the
+region you wish to draw. Other configuration file parameters control
+the drawable regions.
+
+For example, the human karyotype for assembly GRCh37 (hg19, Feb 2009)
+is composed of 24 chromosomes
+
+::
+   
+   chr - hs1 1 0 249250621 chr1
+   chr - hs2 2 0 243199373 chr2
+   chr - hs3 3 0 198022430 chr3
+   ...
+   chr - hs22 22 0 51304566 chr22
+   chr - hsX x 0 155270560 chrx
+   chr - hsY y 0 59373566 chry
+
+   
+together with 862 bands
+
+::
+   
+   band hs1 p36.33 p36.33 0 2300000 gneg
+   band hs1 p36.32 p36.32 2300000 5400000 gpos25
+   band hs1 p36.31 p36.31 5400000 7200000 gneg
+   ...
+   band hsY q11.223 q11.223 22100000 26200000 gpos50
+   band hsY q11.23 q11.23 26200000 28800000 gneg
+   band hsY q12 q12 28800000 59373566 gvar
+
+
+
+cytogenetic bands
+=================
+
+Bands are defined in the same manner as chromosomes, but the first two
+fields are now band and the id of the parent chromosome.
+
+::
+   
+   band hs1 p36.33 p36.33 0 2300000 gneg
+   band hs1 p36.32 p36.32 2300000 5300000 gpos25
+   band hs1 p36.31 p36.31 5300000 7100000 gneg
+   ...
+   band hs2 p25.3 p25.3 0 4300000 gneg
+   band hs2 p25.2 p25.2 4300000 7000000 gpos50
+   band hs2 p25.1 p25.1 7000000 12800000 gneg
+   ...
+
+   
+You can obtain the karyotype structure from `UCSC Genome Viewer Table Browser`_
+(Mapping and Sequencing Tracks > Chromosome Band) . Not all
+genomes have these data, however. For example, mouse (mm9) and rat
+(rn4) have band information, but not dog (canfam2) or cow (bostau3)
+
+.. _UCSC Genome Viewer Table Browser: http://genome.ucsc.edu/cgi-bin/hgTables?command=start
+
+
+You can also grab it from the Circos Plot source_.
+
+.. _source: http://circos.ca/software/download/
+
+
+
+
+
+ideogram selection
+==================
+
+The default behaviour is to display all chromosomes defined in the
+karyotype file, in order of appearance.
+
+
+Use the ideogram selection field to provide either a list
+
+::
+   
+   hs1;hs2;hs3;h4
+
+or regular expression in
+
+::
+   
+   /hs[1-4]$/
+
+to specify which chromosomes to show. You can combine these methods
+
+::
+   
+   /hs[1-4]$/;hs10;hs11
+
+and use - prefix to specify that you don't want a chromosome to be
+drawn
+
+::
+   
+   /hs[1-4]$/;-hs3
+
+Note that the list uses ; as the delimiter. The reason why , is not
+used is because the chromosome entry can include a list of chromosome
+regions to draw, such as
+
+::
+   
+   hs1:(-100,120-);hs2;hs3;h4
+
+The regular expression can match a partial string, so don't forget to
+include a trailing $ anchor if you don't mean to match hs10,hs11,...
+
+
+============
+Data formats
+============
+
+
+Links data format
+=================
+You can draw bezier curves connecting regions along the karyotype.
+
+
+one-line format
+---------------
+
+In the simplest use, link data files are composed of position pairs defined on one line.
+
+::
+
+    ...
+    hs1 100 200 hs2 250 300
+    hs1 400 550 hs3 500 750
+    hs1 600 800 hs4 150 350
+    ...
+
+
+
+two-line format
+---------------
+
+The link is defined across two lines. The lines are associated together using a link id, which is unique for each pair. You must also have exactly two lines for each link id.
+
+::
+   
+    ...
+    segdup00010 hs1 100 200
+    segdup00010 hs2 250 300
+    segdup00011 hs1 400 550
+    segdup00011 hs3 500 750
+    segdup00012 hs1 600 800
+    segdup00012 hs4 150 350
+    ...
+
+
+link options
+------------
+
+As with highlights, you can add an optional 5th field to specify
+link-specific options
+
+::
+   
+    ...
+    hs1 100 200 hs2 250 300 color=blue
+    hs1 400 550 hs3 500 750 color=red,thickness=5p
+    hs1 600 800 hs4 150 350 color=black
+    ...
+
+
+Track data format
+=================
+
+
+types
+-----
+
+Tracks can be of types histogram, line, heatmap or scatter plot,
+always using the same data format:
+  
+::
+   
+    # value 0.005 at span 1000-2000
+    hs1 1000 2000 0.005
+    # value 0.010 at span 2001-2001, e.g. a single base position
+    hs1 2001 2001 0.010
+
+
+
+axis orientation
+----------------
+
+When a track is oriented outward, smaller values are closer to the
+center of the circle than larger ones. For histograms, the net effect
+is that bins for positive values point outward and bins for negative
+values point inward. This is a direct result of the fact that bins
+always drop to y=0, if within display range, or to the axis end closer
+to y=0.
+
+Ofcourse this parameter makes no difference if your track is a
+heatmap.
+
+
+   
+extending bins
+--------------
+
+If you set extend_bin=yes, the bin's left and right sides are extended
+to the mid-point between this and the neighbouring bin. This
+behaviour, in which bins are extended to meet their neighbours, is the
+default setting. Explicitly setting extend_bin=yes is not necessary
+(but useful if you want to toggle this feature later).
+
+For example, if you have data points
+
+::
+   
+    hs1 1000 2000 0.5
+    hs1 5000 5500 0.25
+    hs1 9000 9250 0.75
+
+you set extend_bin=yes, the middle bin 5000-5500 will have its left
+side extended to avg(2000,5000)=3500 and its right side to
+avg(5500,9000)=7250. Thus, even though the data spans are not
+contiguous, the histogram trace will be contiguous across the three
+bins.
+
+If you use extend_bin=no, then the histogram will have three bins,
+each rising from the baseline of the plot.
+
+If your data set is very dense, the histogram can become very busy and
+difficult to interpret. The histogram and line plots are most useful
+when the angular distance between adjacent data points spans at least
+several pixels.
+
+The histogram plot type is very effective for data sets which assign a
+floating point to a span rather than a single genomic point. If your
+data is very dense relative to your output scale, however, I suggest
+using the line plot.
+
+
+
+
+======
+Colors
+======
+
+Common colors (red, green, blue, purple, orange, yellow, grey) are
+defined in 7 tones. Where possible, these are taken from `Brewer palletes`_.
+
+.. _Brewer palletes: http://www.colorbrewer.org/
+
+::
+   
+   vvlHUE very very light HUE (e.g. vvlred)
+   vlHUE      very light     
+   lHUE           light
+   HUE
+   dHUE           dark
+   vdHUE      very dark
+   vvdHUE very very dark
+
+   
+Colors white and black are also defined, as is transparent. 
+
+More about colors here_.
+
+.. _here: http://circos.ca/documentation/tutorials/quick_start/heatmaps_and_colors/
+
+
+---------
+
+
+This tool is based on `Circos Plot`_ by Krzywinski, M. et al.
+
+.. _Circos Plot: http://circos.ca/
+
+</help>
 
 </tool>
 
