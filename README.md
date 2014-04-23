@@ -1,12 +1,19 @@
-circos.py
-=========
+galaxy_circos
+=============
 
-Galaxy tool conf
+[Circos](http://circos.ca) is a plotting tool that creates wonderful graphics.
+
+[PSU Galaxy](http://galaxyproject.org/) is a research tool that allows for accesible, transparent and reproducible computation.
+
+This project consists of a [tool definition file](https://wiki.galaxyproject.org/Admin/Tools/AddToolTutorial) for galaxy and a wrapper script for circos. Together they bring you an accessible interface for the creation of Circos plots from within Galaxy.
+
+
+
+
+Usage
 ----------------
 
-Placing the galaxy_circos.xml within reach of a tools_conf.xml gives
-you access to a convenient Galaxy Tool for generating Circos Plots.
-The script plot.py was actually created for this wrapper.
+You must place the galaxy_circos.xml tool definition file within reach of your tools_conf.xml
 
 For the time being you must manually set up circos and its
 dependencies. Then you must set the proper path to the circos
